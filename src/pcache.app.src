@@ -1,0 +1,12 @@
+{application, pcache,
+ [
+  {description, "pcache - Erlang Process Based Cache"},
+  {vsn, "1.0.0"},
+  {modules, []},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {env, []}
+ ]}.
