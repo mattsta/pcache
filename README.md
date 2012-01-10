@@ -8,9 +8,10 @@ pcache is an improved version of the cache described in http://duomark.com/erlan
 Usage
 -----
 The cache server is designed to memoize a specific Module:Fun. The key in
-a cache is the Argument passed in to Module:Fun/1.
+a cache is the Argument passed to Module:Fun/1.
 
 Start a cache:
+
         CacheName = my_cache,
         M = database,
         F = get_result,
@@ -24,6 +25,7 @@ The entry timer resets to the TTL every time an item is read.  You need to dirty
 the result of M:F(Key) will change from what is in the cache.
 
 Use a cache:
+
         Result = pcache:get(my_cache, <<"bob">>).
         pcache:dirty(my_cache, <<"bob">>, <<"newvalue">>).  % replace entry for <<"bob">>
         pcache:dirty(my_cache, <<"bob">>).  % remove entry from cache
@@ -32,13 +34,15 @@ Use a cache:
         RandomKeys = pcache:rand_keys(my_cache, 12).
 
 Bonus feature: use arbitrary M:F/1 calls in a cache:
+
         Result = pcache:memoize(my_cache, OtherMod, OtherFun, Arg).
         pcache:dirty_memoize(my_cache, OtherMod, OtherFun, Arg).  % remove entry from cache
 
-pcache:memoize/4 helps us get around annoying issues of one-cache-per-mod-fun.
-Your root cache Mod:Fun could be nonsense if you want to use pcache:memoize/4 everywhere.
+`pcache:memoize/4` helps us get around annoying issues of one-cache-per-mod-fun.
+Your root cache Mod:Fun could be nonsense if you want to use `pcache:memoize/4` everywhere.
 
 Short-hand to make a supervisor entry:
+
        SupervisorWorkerTuple = pcache:cache_sup(Name, M, F, Size).
 
 Status
