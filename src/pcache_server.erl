@@ -142,7 +142,7 @@ handle_call(reap_oldest, _From, #cache{datum_index = DatumIndex} = State) ->
     false -> no_datum;
     _ -> OldPid ! {destroy, self()}
   end,
-  {from, ok, State};
+  {reply, ok, State};
 
 handle_call({rand, Type, Count}, _From, 
   #cache{datum_index = DatumIndex} = State) ->
