@@ -115,10 +115,6 @@ handle_call({get, Key}, _From, #cache{datum_index = DatumIndex, cache_used = Use
   {reply, Reply, State#cache{cache_used = New_Size}};
 
 handle_call(total_size, _From, #cache{datum_index = _DatumIndex, cache_used = Used} = State) ->
-  %%AllProcs = ets:tab2list(DatumIndex),
-  %%Pids = [Pid || {_DatumId, Pid} <- AllProcs],
-  %%Size = lists:map(fun(X) -> {ok, S} = get_mem(X), S end, Pids),
-  %%{reply, lists:sum(Size), State};
   {reply, Used, State};
 
 handle_call(stats, _From, #cache{datum_index = DatumIndex} = State) ->
@@ -251,15 +247,6 @@ key(M, F, A) -> {M, F, A}.
 %% ===================================================================
 %% Private
 %% ===================================================================
-
-get_mem(DatumPid) ->
-  DatumPid ! {memsize, self()},
-  receive
-    {memsize, DatumPid, {memory, Size}} -> {ok, Size}
-  after
-    100 -> {no_size, timeout}
-  end.
-
 get_data(DatumPid) ->
   DatumPid ! {get, self()},
   receive
