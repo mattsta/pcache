@@ -188,17 +188,18 @@ handle_cast({dirty, Id, NewData}, #cache{datum_index = DatumIndex} = State) ->
   end,
   {noreply, State};
 
-handle_cast({dirty, Id}, #cache{datum_index = DatumIndex} = State) ->
-  case ets:lookup(DatumIndex, Id) of
-    [{Id, Pid, _}] -> Pid ! {destroy, self()},
+handle_cast({dirty, Id}, #cache{datum_index = DatumIndex, cache_used=Used} = State) ->
+  New_Size = case ets:lookup(DatumIndex, Id) of
+    [{Id, Pid, Size}] -> Pid ! {destroy, self()},
                    receive 
-                     {destroy, Pid, ok} -> ok
+                     {destroy, Pid, ok} -> ets:delete(DatumIndex, Id), 
+                                           Used - Size
                    after 
-                     100 -> fail
+                     100 -> Used 
                    end;
-    [] -> ok
+    [] -> Used 
   end,
-  {noreply, State};
+  {noreply, State#cache{cache_used = New_Size}};
 
 handle_cast({generic_dirty, M, F, A}, 
     #cache{datum_index = DatumIndex} = State) ->
@@ -252,7 +253,7 @@ get_data(DatumPid) ->
   receive
     {get, DatumPid, Data} -> {ok, Data}
   after
-    5000 -> {no_data, timeout}
+    100  -> {no_data, timeout}
   end.
 
 get_key(DatumPid) ->
