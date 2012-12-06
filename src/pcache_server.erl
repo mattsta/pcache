@@ -252,7 +252,7 @@ get_data(DatumPid) ->
   receive
     {get, DatumPid, Data} -> {ok, Data}
   after
-    100 -> {no_data, timeout}
+    5000 -> {no_data, timeout}
   end.
 
 get_key(DatumPid) ->
