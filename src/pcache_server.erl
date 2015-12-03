@@ -288,7 +288,7 @@ launch_memoize_datum(Key, EtsIndex, Module, Accessor, TTL, CachePolicy) ->
 update_ttl(#datum{started = Started, ttl = TTL,
                   type = actual_time} = Datum) ->
   % Get total time in seconds this datum has been running.  Convert to ms.
-  StartedNowDiff = (calendar:time_to_seconds(os:timestamp()) - calendar:time_to_seconds(Started)) * 1000,
+  StartedNowDiff = timer:now_diff(os:timestamp(), Started) div 1000,
   % If we are less than the TTL, update with TTL-used (TTL in ms too)
   % else, we ran out of time.  expire on next loop.
   TTLRemaining = if
