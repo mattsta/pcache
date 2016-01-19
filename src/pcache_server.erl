@@ -266,7 +266,7 @@ get_key(DatumPid) ->
                 last_active, ttl, type = mru, remaining_ttl}).
 
 create_datum(Key, Data, TTL, Type) ->
-  #datum{key = Key, mgr = self(), data = Data, started = now(),
+  #datum{key = Key, mgr = self(), data = Data, started = os:timestamp(),
          ttl = TTL, remaining_ttl = TTL, type = Type}.
 
 launch_datum(Key, EtsIndex, Module, Accessor, TTL, CachePolicy) ->
@@ -288,17 +288,16 @@ launch_memoize_datum(Key, EtsIndex, Module, Accessor, TTL, CachePolicy) ->
 update_ttl(#datum{started = Started, ttl = TTL,
                   type = actual_time} = Datum) ->
   % Get total time in seconds this datum has been running.  Convert to ms.
-  StartedNowDiff = (calendar:time_to_seconds(now()) - 
-                    calendar:time_to_seconds(Started)) * 1000,
+  StartedNowDiff = timer:now_diff(os:timestamp(), Started) div 1000,
   % If we are less than the TTL, update with TTL-used (TTL in ms too)
   % else, we ran out of time.  expire on next loop.
   TTLRemaining = if
                    StartedNowDiff < TTL -> TTL - StartedNowDiff;
                                    true -> 0
                  end,
-  Datum#datum{last_active = now(), remaining_ttl = TTLRemaining};
+  Datum#datum{last_active = os:timestamp(), remaining_ttl = TTLRemaining};
 update_ttl(Datum) ->
-  Datum#datum{last_active = now()}.
+  Datum#datum{last_active = os:timestamp()}.
 
 update_data(Datum, NewData) ->
   Datum#datum{data = NewData}.
