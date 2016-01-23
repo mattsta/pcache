@@ -1,6 +1,8 @@
 pcache: Erlang Process Based Cache
 ==================================
 
+[![Build Status](https://secure.travis-ci.org/mattsta/pcache.png)](http://travis-ci.org/mattsta/pcache)
+
 pcache uses erlang processes to auto-expire cache items.
 
 pcache is an improved version of the cache described in http://duomark.com/erlang/publications/acm2006.pdf
