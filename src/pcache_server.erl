@@ -287,15 +287,16 @@ launch_memoize_datum(Key, EtsIndex, Module, Accessor, TTL, CachePolicy) ->
 
 update_ttl(#datum{started = Started, ttl = TTL,
                   type = actual_time} = Datum) ->
+  Timestamp = os:timestamp(),
   % Get total time in seconds this datum has been running.  Convert to ms.
-  StartedNowDiff = timer:now_diff(os:timestamp(), Started) div 1000,
+  StartedNowDiff = timer:now_diff(Timestamp, Started) div 1000,
   % If we are less than the TTL, update with TTL-used (TTL in ms too)
   % else, we ran out of time.  expire on next loop.
   TTLRemaining = if
                    StartedNowDiff < TTL -> TTL - StartedNowDiff;
                                    true -> 0
                  end,
-  Datum#datum{last_active = os:timestamp(), remaining_ttl = TTLRemaining};
+  Datum#datum{last_active = Timestamp, remaining_ttl = TTLRemaining};
 update_ttl(Datum) ->
   Datum#datum{last_active = os:timestamp()}.
 
