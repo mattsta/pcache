@@ -34,9 +34,7 @@ shrink_cache_to_size(Name, _CurrentCacheSize, CacheSize) ->
 
 pcache_reaper(Name, CacheSize) ->
   % sleep for 4 seconds
-  receive
-    after 4000 -> ok
-  end,
+  timer:sleep(4000),
   % Lame.  Account for sizes better.  total_size asks every datum for its size.
   CurrentCacheSize = pcache:total_size(Name),
   if
