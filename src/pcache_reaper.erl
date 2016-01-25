@@ -25,25 +25,18 @@ start(CacheName, CacheSize) ->
 %%%----------------------------------------------------------------------
 
 shrink_cache_to_size(_Name, CurrentCacheSize, CacheSize) 
-  when CurrentCacheSize < CacheSize ->
+  when CurrentCacheSize =< CacheSize ->
   ok;
 shrink_cache_to_size(Name, _CurrentCacheSize, CacheSize) ->
   gen_server:call(Name, reap_oldest),
   shrink_cache_to_size(Name, pcache:total_size(Name), CacheSize).
-   
 
 pcache_reaper(Name, CacheSize) ->
   % sleep for 4 seconds
   timer:sleep(4000),
   % Lame.  Account for sizes better.  total_size asks every datum for its size.
   CurrentCacheSize = pcache:total_size(Name),
-  if
-    CurrentCacheSize =< CacheSize -> ok;
-    CurrentCacheSize > CacheSize ->
-%io:format("Cache ~p too big!  Shrinking...~n", [self()]),
-%io:format("CurrentSize: ~p; Target Size: ~p~n", [CurrentCacheSize, CacheSize]),
-      shrink_cache_to_size(Name, CurrentCacheSize, CacheSize)
-  end,
+  shrink_cache_to_size(Name, CurrentCacheSize, CacheSize),
   pcache_reaper(Name, CacheSize).
     
 init([Name, CacheSizeBytes]) ->
